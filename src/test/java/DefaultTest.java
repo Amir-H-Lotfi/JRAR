@@ -14,11 +14,14 @@ import java.util.Objects;
 
 class DefaultTest {
 
-    private final String fTest = "rar-files/test1.rar";
-    private final String sTest = "rar-files/test2.rar";
+    private final String fTest = "test-res/test1.rar";
+    private final String sTest = "test-res/test2.rar";
 
     private final UnRAR library = UnRARLibrary.getInstance();
     private final String archName = Objects.requireNonNull(getClass().getResource(fTest)).getPath().substring(1);
+
+    DefaultTest() throws Exception {
+    }
 
     @Test
     void OpenFile_CloseFile() {
@@ -32,7 +35,8 @@ class DefaultTest {
 
         Assertions.assertNotNull(file);
 
-        library.RARCloseArchive(file);
+        int cCode = library.RARCloseArchive(file);
+        Assertions.assertEquals(cCode, 0);
     }
 
     @Test
@@ -54,7 +58,8 @@ class DefaultTest {
         Assertions.assertEquals(archive.OpenResult, 0);
         Assertions.assertEquals(archive.CmtState, 1);
 
-        library.RARCloseArchive(file);
+        int cCode = library.RARCloseArchive(file);
+        Assertions.assertEquals(cCode, 0);
     }
 
     @Test
@@ -81,7 +86,8 @@ class DefaultTest {
 
         Assertions.assertEquals(hCode, 0);
 
-        library.RARCloseArchive(file);
+        int cCode = library.RARCloseArchive(file);
+        Assertions.assertEquals(cCode, 0);
     }
 
     @Test
@@ -105,8 +111,10 @@ class DefaultTest {
         var tempDir = Files.createTempDirectory("java.jrar.temp.").toAbsolutePath();
 
         while (library.RARReadHeader(file, header) == 0) {
-            library.RARProcessFile(file, Constants.OperationCode.RAR_EXTRACT, tempDir.toString(), null);
+            int pCode = library.RARProcessFile(file, Constants.OperationCode.RAR_EXTRACT, tempDir.toString(), null);
+            Assertions.assertEquals(pCode, 0);
         }
+
 
         try (var tdIterator = Files.walk(tempDir).sorted(Comparator.reverseOrder())) {
             tdIterator.forEach(item -> {
@@ -117,7 +125,8 @@ class DefaultTest {
             });
         } catch (Exception ignored) {
         }
-        library.RARCloseArchive(file);
+        int cCode = library.RARCloseArchive(file);
+        Assertions.assertEquals(cCode, 0);
     }
 
     @Test

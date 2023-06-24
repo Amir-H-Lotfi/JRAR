@@ -7,14 +7,20 @@ public class UnRARLibrary {
     private final static UnRAR INSTANCE;
 
     static {
-        INSTANCE = Native.load("dll/UnRAR64.dll", UnRAR.class);
+        String os = System.getProperty("os.name");
+        if (os.startsWith("Windows"))
+            INSTANCE = Native.load("lib/UnRAR64.dll", UnRAR.class);
+        else INSTANCE = null;
     }
 
     private UnRARLibrary() {
 
     }
 
-    public static UnRAR getInstance() {
+    public static UnRAR getInstance() throws Exception {
+        if (INSTANCE == null) {
+            throw new Exception("Failed to load library");
+        }
         return INSTANCE;
     }
 
